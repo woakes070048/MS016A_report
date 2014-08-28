@@ -1,0 +1,37 @@
+\documentclass[11pt,english,a4paper] {report}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel,graphicx,varioref}
+\usepackage{palatino}
+\usepackage{relsize}
+\usepackage{varioref}
+\usepackage{pdfpages}
+\usepackage{fancyvrb}
+\usepackage{fancyhdr}
+\usepackage{sectsty}
+\usepackage{times}
+\usepackage{apacite}
+
+\bibliographystyle{apacite}
+
+\usepackage[colorlinks=true,pdfstartview=FitH, linkcolor=blue, 
+            citecolor=blue, urlcolor=blue,bookmarksopen=true]{hyperref}
+\parindent=0in
+\fvset{frame=single,framesep=3mm,fontfamily=helvetica,fontsize=\scriptsize}
+
+\renewcommand\ttfamily{\small\bf\fontfamily{helvetica}}
+
+\begin{document}
+\title{  MS016A Lab Report\\ Lars Haugan - s171201 }
+
+\allsectionsfont{\sffamily}
+\fontfamily{tnr}\selectfont
+\maketitle
+
+\tableofcontents{}
+
+\include{chapter1}
+
+\bibliography{references}
+
+\end{document}
