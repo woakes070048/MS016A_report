@@ -10,27 +10,68 @@
 \usepackage{fancyhdr}
 \usepackage{sectsty}
 \usepackage{times}
-\usepackage{apacite}
+\usepackage{hyperref}
 
+%\usepackage[colorlinks=true,pdfstartview=FitH, linkcolor=blue, 
+            %citecolor=blue, urlcolor=blue,bookmarksopen=true]{hyperref}
+\def\course{MS016A}
+\def\reportname{Lab Report}
+\def\name{Lars Haugan}
+\author{Lars Haugan - s171201}
+\def\studentnr{s171201}
+\def\line{NSA}
+\def\school{University of Oslo \\ Oslo and Akershus Univeristy College of Applied Sciences}
+\def\semester{Autumn 2014}
+
+\hypersetup
+{
+        pdftitle={\reportname},
+        pdfauthor={\name},
+        pdfsubject={\reportname},
+        colorlinks=true,
+        linkcolor=blue,
+        citecolor=black,
+        urlcolor=blue,
+        pdfstartview=FitH,
+        bookmarksopen=true
+}
+
+\usepackage{apacite}
 \bibliographystyle{apacite}
 
-\usepackage[colorlinks=true,pdfstartview=FitH, linkcolor=blue, 
-            citecolor=blue, urlcolor=blue,bookmarksopen=true]{hyperref}
 \parindent=0in
 \fvset{frame=single,framesep=3mm,fontfamily=helvetica,fontsize=\scriptsize}
 
 \renewcommand\ttfamily{\small\bf\fontfamily{helvetica}}
+\newcommand{\HRule}{\rule{\linewidth}{0.2mm}}
 
 \begin{document}
-\title{  MS016A Lab Report\\ Lars Haugan - s171201 }
+\begin{titlepage}
+    \begin{center}
+
+        \large \line\\
+        \large \school\\ \semester\\[0.4cm]
+        \HRule\\[1.5cm]
+        \name, \studentnr
+        \ \\[6.0cm]
+        \LARGE\textbf{\course\ - \reportname}
+
+    \end{center}
+\end{titlepage}
+
+
+%\title{  \course\ \reportname } %\\ \name \ - \studentnr }
 
 \allsectionsfont{\sffamily}
-\fontfamily{tnr}\selectfont
-\maketitle
+%\fontfamily{tnr}\selectfont
+%\maketitle
 
-\tableofcontents{}
+\tableofcontents
 
 \include{chapter1}
+
+blabla \cite{Vickrey1961}
+blablabla
 
 \bibliography{references}
 

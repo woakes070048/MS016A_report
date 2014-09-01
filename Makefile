@@ -9,7 +9,7 @@ normal:
 	bibtex report
 	pdflatex report.tex
 	pdflatex report.tex
-	open report.pdf &
+	#open report.pdf &
 
 clean:
 	rm -vf *.aux \
