@@ -3,7 +3,9 @@
 \textbf{Keywords: Virtualization, Cloud computing, performance, scripting} 
 
 \subsection*{Abstract}
-
+This report takes a look at the implementation of a dynamic setup in cloud-based
+web-services that scale with the load. With the loadbalancer HAproxy and
+implemented through OpenStack APIs.
 
 \section{Introduction}
 
@@ -15,13 +17,23 @@ The given problem statement in this project was as follows:
 webservers based on the incoming rate of user requests.}
 
 \section{Background}
+When having a large site with many visitors or resource demanding calculations
+there is a need to be able to run the calculations on multiple servers. Running
+just a single machine will result in slow response time, and possible loss of
+service. To solve this, multiple servers serving sites needs to be used. This
+is done through the use of load balancers. 
+
+
 
 \subsection{Benchmarking webservers}
 
 \subsection{httperf}
 
+\subsection{HAproxy}
 
-\section*{Approach}
+\subsection{Cloud}
+
+\section{Approach}
 
 \section{Result}
 
