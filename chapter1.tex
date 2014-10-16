@@ -68,7 +68,7 @@ compatible with the implementation from Amazon (AWS). This means that it is
 possible to use \textit{python-novaclient} also with AWS. This is powerful when
 developing tools that are supposed to work with clouds.
 
-\subsection{Load balancing with HAProxy}
+\subsection{HAProxy for load balancing}
 HAProxy (High Availability proxy) is a free, very fast and reliable solution offering
 high availability, load balancing, and proxying for TCP and HTTP-based applications
 \cite{haproxy:2014}. It is used by large sites like Reddit, Stack Overflow and
@@ -90,16 +90,43 @@ service.
 
 
 \section{Approach}
-In this study we will create a application that enables a web service to scale
-in a cloud environment.
+This study will focus on creating a application that enables scaling of a web 
+service in a cloud environment. It will explore the possibility of web scaling
+by implementing the posibilities of OpenStack and HAProxy in a Python
+application. 
+This will make it possible to make an application that is tightly integrated
+with both OpenStack and HAProxy and make good use of the tight integration.
+
+\subsection{Setup}
 
 \subsection{OpenStack integration}
+OpenStack provides excellent possibilities for integration when programming in
+Python. With the use of \textit{python-novaclient} it is possible to do almost
+anything you can do with nova through either the CLI or OpenStack Horizon.
+
+It is to be expected that the integration can provide all the needed
+functionality of handling the instances. This means that it is possible to
+handle the creation of new instances and provide the needed information so that
+OpenStack handles the installation of the needed software on the new servers.
+This can be done through the usage of cloud-data which is served with a
+metadata service provided by OpenStack.
+
+With this the application can scale up completely new instances which is
+configured for the service within a short amount of time. When the instances
+are no longer needed, the integration can shutdown or delete the instance
+altogether.
 
 \subsection{HAProxy integration}
 
 \subsection{Needed data}
+% Rate of incomming requests.
+
+% How to scale based on the data
 
 \subsection{Expected data}
+% Output of the script
+
+\subsection{How to test}
 
 To be able to scale the web service based on the incomming count of requests,
 there are multiple aspects that needs to be implemented. These include the
