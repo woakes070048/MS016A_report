@@ -4,7 +4,7 @@
 \subsection*{Abstract}
 
 This report takes a look at the implementation of a dynamic setup in cloud-based
-web-services that scale with the load. With the load balancer HAproxy and
+web-services that scale with the load. With the load balancer HAProxy and
 implemented through OpenStack APIs.
 
 \section{Introduction}
@@ -68,28 +68,39 @@ compatible with the implementation from Amazon (AWS). This means that it is
 possible to use \textit{python-novaclient} also with AWS. This is powerful when
 developing tools that are supposed to work with clouds.
 
-\subsection{Load balancing with HAproxy}
-HAProxy is a free, very fast and reliable solution offering high availability,
-load balancing, and proxying for TCP and HTTP-based
-applications. \cite{haproxy:2014}
+\subsection{Load balancing with HAProxy}
+HAProxy (High Availability proxy) is a free, very fast and reliable solution offering
+high availability, load balancing, and proxying for TCP and HTTP-based applications
+\cite{haproxy:2014}. It is used by large sites like Reddit, Stack Overflow and
+Twitter \cite{haproxy:they_use_it}. Some of the features it provides in the
+latest version is native SSL/TLS termination, which is lacking from most other
+freely available load balancers, full HTTP keep-alive, IPv6 support, health
+checks and much more \cite{haproxy:2014}. There are other free load balancers
+that can be used, such as apache with mod, nginx, pound and varnish. Varnish is
+mostly used only for caching and does not support SSL/TLS termination. HAProxy
+appears to be a de facto standard when it comes to open source load
+balancers.\\
 
+These solutions creates a background for the solution to be created that can
+make a service scale in a cloud environment. All this so we can save money, and
+serve solutions that will prevail with large amounts of requests.
+It is also worth noting that it will not only save the provider money, but
+ultimately lower energy usage that could lower the environmental impact of a
+service.
 
-% What are we trying to do?
-% Why?
-% As few nodes as possible to save money or power. Bidirectional scaling
-% Green initiative
-
-
-\subsection{Web services in OpenStack}
-There are many kinds of web services that can be hosted in a cloud environment.
-Services like these are either user oriented services where some functional
-site is presented to the end user, or a web service that is created to present
-data to other applications. This is called a web service, but should not be
-confused with the same usage of the word web services.
-
-\subsection{Integration to OpenStack}
 
 \section{Approach}
+In this study we will create a application that enables a web service to scale
+in a cloud environment.
+
+\subsection{OpenStack integration}
+
+\subsection{HAProxy integration}
+
+\subsection{Needed data}
+
+\subsection{Expected data}
+
 To be able to scale the web service based on the incomming count of requests,
 there are multiple aspects that needs to be implemented. These include the
 ability to create/start/stop/destroy instances (read: Virtual machines) and
@@ -99,6 +110,13 @@ monitor the number of incomming requests.
 * Describe the design of the project
 * How the data should look
 * How to analyze the data
+
+% Is the type of study explained?
+% Are all the experiments explained?
+% Are the assumptions explained?
+% Are there limitations to the approach which you are aware of (NOT hindsight)?
+% Is there an explained connection between the data you want to gather and the
+% problem you investigate?
 
 \subsection{Creating a webscaler}
 
