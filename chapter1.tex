@@ -18,11 +18,11 @@ webservers based on the incoming rate of user requests.}
 
 \section{Background}
 Cloud computing is becoming more and more popular, and is being implemented
-in many parts of the industry. You can rent resources from large providers like
-Amazon which provides a public cloud infrastructure or by building your own
-cloud infrastructure. This can be done with open source tools like OpenStack.
-There is also a third alternative that is the hybrid cloud, which enables easy
-transaction from using both a private cloud and public clouds.\\
+in many parts of the industry \cite{OpenStack:Users}. You can rent resources 
+from large providers like Amazon which provides a public cloud infrastructure 
+or by building your own cloud infrastructure. This can be done with open source 
+tools like OpenStack. There is also a third alternative that is the hybrid cloud,
+which enables easy transaction from using both a private cloud and public clouds.\\
 
 Having these cloud infrastructures, make it possible to have services
 that scale over multiple locations, and to utilize the resources that are
@@ -39,12 +39,39 @@ service.\\
 
 To handle this we need a way of scaling the number of servers in a way that
 will give the expected result for the consumers, but at the same time use the
-bare minimum amount to save money.\\
+bare minimum amount needed in able to save money.\\
 
+This will make the basis for this chapter where we will look into a solution to
+scale a web service over multiple servers in an OpenStack environment.
 
 \subsection{Cloud solution with OpenStack}
+OpenStack is a free open source cloud software, that can be used to provide
+infrastructure as a service (IaaS). 
+OpenStack proclaims to be one of the fastest growing open source communities in
+the world, backed by some of the biggest names in the industry like
+RedHat and HP \cite{OpenStack:2014}. It is built up of multiple services
+where each is responsible to handle a part of the operation in the cloud. Most
+notably of these are nova, which handles the instances it selves and the
+communication with the vitalization hypervisor. There are a total of 13
+services which handles everything from identities, storage, networking,
+orchestration and much more.\\
+
+OpenStack is a viable cloud solution due to the large scale implementation, and
+the large community supporting further development. One of the features provided 
+and result of the open source software are the APIs that are available. 
+\textit{Python-novaclient} implementation that provides almost full integration
+with nova. Other implementations for the other OpenStack services are also
+available. Since OpenStack are implemented in Python, there has been more work
+on these API implementations, than what you might expect from a open source
+project. According to \cite{OpenStack:api_comparison} the nova API is
+compatible with the implementation from Amazon (AWS). This means that it is
+possible to use \textit{python-novaclient} also with AWS. This is powerful when
+developing tools that are supposed to work with clouds.
 
 \subsection{Load balancing with HAproxy}
+HAProxy is a free, very fast and reliable solution offering high availability,
+load balancing, and proxying for TCP and HTTP-based
+applications. \cite{haproxy:2014}
 
 
 % What are we trying to do?
@@ -68,10 +95,6 @@ there are multiple aspects that needs to be implemented. These include the
 ability to create/start/stop/destroy instances (read: Virtual machines) and
 monitor the number of incomming requests.
 
-\subsection{HAproxy}
-HAProxy is a free, very fast and reliable solution offering high availability,
-load balancing, and proxying for TCP and HTTP-based
-applications. \cite{haproxy:2014}
 
 * Describe the design of the project
 * How the data should look
@@ -104,7 +127,7 @@ applications. \cite{haproxy:2014}
 \end{figure}
 
 \section{Discussion and conclusion}
-
+% Why did i not use MLN
 \subsection{Improvements}
 
 \subsection{Conclusion}
