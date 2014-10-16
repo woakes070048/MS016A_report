@@ -1,10 +1,10 @@
-\chapter{Dynamic cloud-based scaling web-service}
-
-\textbf{Keywords: Virtualization, Cloud computing, performance, scripting} 
+\chapter{Dynamic cloud-based scaling web services}
+\textbf{Keywords: Virtualization, Cloud computing, performance, scripting}
 
 \subsection*{Abstract}
+
 This report takes a look at the implementation of a dynamic setup in cloud-based
-web-services that scale with the load. With the loadbalancer HAproxy and
+web-services that scale with the load. With the load balancer HAproxy and
 implemented through OpenStack APIs.
 
 \section{Introduction}
@@ -17,29 +17,100 @@ The given problem statement in this project was as follows:
 webservers based on the incoming rate of user requests.}
 
 \section{Background}
-When having a large site with many visitors or resource demanding calculations
-there is a need to be able to run the calculations on multiple servers. Running
-just a single machine will result in slow response time, and possible loss of
-service. To solve this, multiple servers serving sites needs to be used. This
-is done through the use of load balancers. 
+Cloud computing is becoming more and more popular, and is being implemented
+in many parts of the industry. You can rent resources from large providers like
+Amazon which provides a public cloud infrastructure or by building your own
+cloud infrastructure. This can be done with open source tools like OpenStack.
+There is also a third alternative that is the hybrid cloud, which enables easy
+transaction from using both a private cloud and public clouds.\\
+
+Having these cloud infrastructures, make it possible to have services
+that scale over multiple locations, and to utilize the resources that are
+available. When having spanning clouds we can use this to our advantage 
+and create solutions to create more sturdy solutions, that will scale web
+services in a more cost efficient way.\\
+
+Web services with many consumers or with a high demand for calculation power
+will need to be able to use multiple servers to provide service to the clients.
+The number of servers needed is proportionate to the number of visitors and
+calculations needed to provide the service. If there is not enough servers to
+handle the load, there will a result in long response times or even loss of
+service.\\
+
+To handle this we need a way of scaling the number of servers in a way that
+will give the expected result for the consumers, but at the same time use the
+bare minimum amount to save money.\\
 
 
+\subsection{Cloud solution with OpenStack}
 
-\subsection{Benchmarking webservers}
+\subsection{Load balancing with HAproxy}
 
-\subsection{httperf}
 
-\subsection{HAproxy}
+% What are we trying to do?
+% Why?
+% As few nodes as possible to save money or power. Bidirectional scaling
+% Green initiative
 
-\subsection{Cloud}
+
+\subsection{Web services in OpenStack}
+There are many kinds of web services that can be hosted in a cloud environment.
+Services like these are either user oriented services where some functional
+site is presented to the end user, or a web service that is created to present
+data to other applications. This is called a web service, but should not be
+confused with the same usage of the word web services.
+
+\subsection{Integration to OpenStack}
 
 \section{Approach}
+To be able to scale the web service based on the incomming count of requests,
+there are multiple aspects that needs to be implemented. These include the
+ability to create/start/stop/destroy instances (read: Virtual machines) and
+monitor the number of incomming requests.
+
+\subsection{HAproxy}
+HAProxy is a free, very fast and reliable solution offering high availability,
+load balancing, and proxying for TCP and HTTP-based
+applications. \cite{haproxy:2014}
+
+* Describe the design of the project
+* How the data should look
+* How to analyze the data
+
+\subsection{Creating a webscaler}
+
+\subsection{Data gathering and testing}
+
+ %What is the claim
+ %What to do
+ %How do i test
+ %Output
+ %Optional approaches
+ %Calcualtion differences
+ %reqs
+ %reactive \/ proactive
 
 \section{Result}
-
+ %What happened
 
 \section{Analysis}
+ %Look at the data
+\begin{figure}[htp]
+%\centering
+%\includegraphics[scale=0.6]{chapter1/server_scaling}
+\centering
+\makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{chapter1/server_scaling}}
+\caption{\label{fig:server_scaling}Scaling of servers}
+\end{figure}
 
 \section{Discussion and conclusion}
 
+\subsection{Improvements}
+
 \subsection{Conclusion}
+
+
+
+requests per seconds fornuftig kan vi forvente at en server toler akkurat
+det vi har satt i forhold til at det er forskjellige urler
+
