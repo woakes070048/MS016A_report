@@ -1,0 +1,13 @@
+httperf --server balance2 --port 80 --num-conns 1200 --rate 1 & #20min
+sleep 120
+httperf --server balance2 --port 80 --num-conns 4800 --rate 10 & #8min
+sleep 60
+httperf --server balance2 --port 80 --num-conns 3600 --rate 10 & #6min
+sleep 60
+httperf --server balance2 --port 80 --num-conns 3000 --rate 10 & #5min
+sleep 60
+httperf --server balance2 --port 80 --num-conns 9600 --rate 40 & #4min
+sleep 120
+httperf --server balance2 --port 80 --num-conns 4800 --rate 10 &
+httperf --server balance2 --port 80 --num-conns 4800 --rate 10 &
+httperf --server balance2 --port 80 --num-conns 9600 --rate 40 & #4min
