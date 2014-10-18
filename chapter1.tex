@@ -224,7 +224,7 @@ load, a simulation is needed. The needed function for the simulation is the
 possibility to vary the amount of requests to the load balancer. In the first
 place the simulation will use httperf to generate load on the load balancer,
 but since a variation is needed, this can be implemented by running multiple
-httperf.
+httperf. This is implemented as \ref{simulator}.
 
 \lstinputlisting[label=simulator, caption=Simulator of request increased and
 descreased, numbers=none]{chapter1/simulator.txt}
@@ -243,8 +243,15 @@ level of resources. That would be more of a proactive approach, and not a
 reactive approach as this study intends.
 
 \section{Result}
- %What happened
+%What happened
+This study presents a Webscaler written in Python that integrates into
+OpenStack Nova and uses the load balancer HAProxy.
 
+\subsection{Program flow}
+
+\subsection{Launching instances from Python with nova}
+
+\subsection{Automatic configuration of }
 \section{Analysis}
  %Look at the data
 \begin{figure}[htp]
