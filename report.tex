@@ -12,6 +12,7 @@
 \usepackage{times}
 \usepackage{hyperref}
 \usepackage{amsmath}
+\usepackage{geometry}
 
 %For code listings
 \usepackage{color}
@@ -20,30 +21,50 @@
 \usepackage{courier}
 \usepackage{pdfpages}
 \usepackage{varioref}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{keywordcolor}{RGB}{133,0,3}
+\definecolor{commentcolor}{RGB}{135,136,117}
+\definecolor{numbercolor}{RGB}{38,38,38}
+\definecolor{stringcolor}{RGB}{211,0,53}
+
+%\renewcommand*\rmdefault{Consolas, 'Liberation Mono', Menlo, Courier, monospace}
+
+\def\ff{Consolas, 'Liberation Mono', Menlo, Courier, monospace}
+
 \lstset{
-         basicstyle=\scriptsize,%\footnotesize\ttfamily, % Standardschrift
-         numbers=left,               % Ort der Zeilennummern
-         numberstyle=\scriptsize,%\tiny,          % Stil der Zeilennummern
-         %stepnumber=2,               % Abstand zwischen den Zeilennummern
-         numbersep=5pt,              % Abstand der Nummern zum Text
-         tabsize=2,                  % Groesse von Tabs
-         extendedchars=true,         %
-         breaklines=true,            % Zeilen werden Umgebrochen
-         keywordstyle=\color{red},
-            frame=b,         
- %        keywordstyle=[1]\textbf,    % Stil der Keywords
- %        keywordstyle=[2]\textbf,    %
- %        keywordstyle=[3]\textbf,    %
- %        keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
-         stringstyle=\color{white}\ttfamily, % Farbe der String
-         showspaces=false,           % Leerzeichen anzeigen ?
-         showtabs=false,             % Tabs anzeigen ?
-         xleftmargin=17pt,
-         framexleftmargin=17pt,
-         framexrightmargin=5pt,
-         framexbottommargin=4pt,
-         %backgroundcolor=\color{lightgray},
-         showstringspaces=true%false      % Leerzeichen in Strings anzeigen ?        
+    basicstyle=\scriptsize\fontfamily{\ff},%\footnotesize\ttfamily, % Standardschrift
+    numbers=left,               % Ort der Zeilennummern
+    numberstyle=\scriptsize,%\tiny,          % Stil der Zeilennummern
+    %stepnumber=2,               % Abstand zwischen den Zeilennummern
+    numbersep=5pt,              % Abstand der Nummern zum Text
+    tabsize=2,                  % Groesse von Tabs
+    extendedchars=true,         %
+    breaklines=true,            % Zeilen werden Umgebrochen
+    %keywordstyle=\color{red},
+    frame=b,         
+    keywordstyle=[1]\textbf,    % Stil der Keywords
+    keywordstyle=[2]\textbf,    %
+    keywordstyle=[3]\textbf,    %
+    %keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
+    %stringstyle=\color{white}\ttfamily, % Farbe der String
+    showspaces=false,           % Leerzeichen anzeigen ?
+    showtabs=false,             % Tabs anzeigen ?
+    xleftmargin=17pt,
+    framexleftmargin=17pt,
+    framexrightmargin=5pt,
+    framexbottommargin=4pt,
+    %backgroundcolor=\color{lightgray},
+    showstringspaces=false,%false      % Leerzeichen in Strings anzeigen ?        
+    breakatwhitespace=false,
+    keepspaces=true,
+    commentstyle=\color{commentcolor}\fontfamily{\ff},%codegreen},
+    keywordstyle=\color{keywordcolor}\fontfamily{\ff}, %magenta},
+    numberstyle=\tiny\color{numbercolor}\fontfamily{\ff}, %codegray
+    stringstyle=\color{stringcolor}\fontfamily{\ff}%codepurple
  }
  \lstloadlanguages{
         Python,
