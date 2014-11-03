@@ -1,0 +1,74 @@
+\chapter{Comparing HAProxy and Pound load balancers}
+\textbf{Keywords: Webservers, Performance, Analysis}
+
+\subsection*{Abstract}
+
+\section{Introduction}
+
+\subsubsection{Problem statement}
+
+The given problem statement in this project was as follows:
+
+\emph{Setup and evaluate and compare the perlbal and pound load balancers for a
+web- service with regard to:
+\begin{itemize}
+    \item Configureability
+    \item Performance
+    \item Scalability
+\end{itemize}}
+
+\section{Background}
+Load balancers are important to most of the high end websites that are
+available. Ensuring high availability and great scalability. They can be a part
+of even the smallest sites that are prone to fail, but that need high uptime,
+or to balance the load over multiple webservers, or database servers.
+
+% Talk about httperf
+
+% Talk about HAProxy
+
+% Talk about Pound
+
+\section{Approach}
+% How thing is supposed to be set up
+% Hypothesis
+
+% assumption: set of assumption for the different cases
+% how the setup is
+% The different cases:
+    % httperf with increasing rate of requests and/or connections
+        % naturally that there are multiple requests per connection
+
+\section{Result}
+%What happened
+% Subsection: Configurability
+%   Syntax? Functions, documentation, community and continuous support (new
+%   versions?) This is relevant, but not directly to how it works. Evaluate
+%   this!
+%
+
+
+% the data are presented as described in the approach section
+% how are the tests run
+% sample output of scripts and/or httperf
+% present the data for the spesifik sets
+    % how to find the data and how they were analyzed
+
+
+% ssl signing: openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:4096
+% -keyout mycert.pem -out mycert.pem
+
+\section{Analysis}
+ %Look at the data
+ % Analyze the hypothesis
+
+\section{Discussion and conclusion}
+
+
+\subsection{Improvements}
+% SSL and why we dont care here. 
+% Other possible benchmarking tools?
+
+\subsection{Conclusion}
+
+\section{Appendix}
