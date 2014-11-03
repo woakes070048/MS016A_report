@@ -312,8 +312,23 @@ configuration with the new servers.
 
 \subsection{Program structure}
 \begin{minipage}[t]{0.7\textwidth}
-Many stuffing stuffings with suffing in the stuffing, since stuffing is stuffed
-to the stuff of stuff.
+The program structure is based on a folder structure to create a cleaner
+working environment. This means that all the code are separated into a folder
+called \textit{bin}, and all the configuration is separated into a folder
+called \textit{etc}. The main program \textit{webscaler.py} is at the root of
+the application folder alongside the \textit{requirements.txt}. The
+requirements file is added to ensure that all the packages needed can be
+installed with the use of the package manager \textit{pip} (Python Package
+Index). With the combination of virtual environments this application can run
+anywhere where Python can run.
+This makes it easy to get up and running, with the following four commands:
+\begin{Verbatim}[frame=none]
+$ virtualenv /path/to/new/environment
+$ source /path/to/new/environment/bin/activate
+$ pip install -r requirements.txt
+(env)$ python webscaler.py
+\end{Verbatim}
+
 \end{minipage}
 \begin{minipage}[t]{0.3\textwidth}
 \dirtree{%
@@ -333,8 +348,77 @@ to the stuff of stuff.
 .2 webscaler.py.
 }
 \end{minipage}
+The \textit{webscaler.py} file contains the main logic of the scaler
+application, see Appendix
+~\ref{lst:webscaler.py}:~\nameref{lst:webscaler.py}. This program does not work
+without the other files under the \textit{bin} directory. These files include
+some central functionality for operating and communicating with the load
+balancer and OpenStack. The implementation of this is described in more detail
+here.
 
-\subsection{Configuration options}
+\subsubsection{OpenStack integration}
+The OpenStack integration uses a module to Python called the
+\textit{python-novaclient}. This is built on the same module that is possible
+to use from the command line to handle OpenStack nova operations. This
+requires a configuration file in the \textit{etc} directory called
+\textit{openstack.cfg}. This configuration is a pythonified nova api
+configuration, that is supplied by OpenStack that presents the AUTH endpoint
+and the user credentials.
+This configuration file is read in when the \textit{openstack} class in the
+nova.py file is referenced. See \ref{lst:nova.py}:~\nameref{lst:nova.py}.
+
+This code handles all the integration with OpenStack, and provides important
+functions like listing the existing instances, shutdown instances, creation of
+new instances and operations on them.
+
+To create a new instance there are two possible functions to use, the
+\textit{create\_multiple(number)} and \textit{create\_backend()}. The first is
+always calling the second function, but can iterate over multiple new
+instances, threading each new creation shown in \ref{lst:create_multiple}. The name
+is derived from the existing instances, so that the names are human-readable in
+the manner of \textit{node-1, node-2, node-3 \dots}. This ensures easy lookup
+when debugging, as the nodes will always have the same order, also in the load
+balancer.
+
+\begin{center}
+\lstinputlisting[label=lst:create_multiple,caption=Nova.py: Creation of multiple instances,
+language=Python,firstline=67,lastline=80]
+{chapter1/Webscaler/bin/nova.py}
+\end{center}
+
+A new instance is created with the function \textit{create\_backend()}. This
+defines all the needed parameters for the new instances to be created.
+One of the things that is important to handle when using OpenStack, is the time
+it takes after the instance has been created until the IP address is associated
+with the new instance. This is done by sleeping while the instance is beeing
+built, and after this get the new version.
+To prime the new instances the instance is injected with \textit{clouddata}
+\ref{lst:clouddata.txt} which is a bash script that installs Apache and PHP.
+
+\begin{center}
+\lstinputlisting[label=lst:create_backend,caption=nova.py: Function to create a backend,
+language=Python,firstline=84,lastline=119]
+{chapter1/Webscaler/bin/nova.py}
+\end{center}
+
+The integration is by itself generic, and as long as other cloud solution gives
+a supported API or other integration similar to OpenStack, this application is
+quite portable. This means that if the python-novaclient library cannot be
+used, the only change needed is the nova-openstack python class created in the
+\textit{nova.py} file.
+
+\subsubsection{HAProxy integration}
+There are two ways this application works with HAProxy. This is through the
+socket connection that are established by the \textit{HAconn.py} file,
+\ref{lst:haconn.py}: \nameref{lst:haconn.py}, and with the generation of the
+configuration file haproxy.conf, \ref{haproxy.cfg}:\nameref{haproxy.cfg},
+located under \textit{/etc/haproxy/haproxy.conf}. This uses the Python template
+library \textit{Jinja} to make a template file that can be injected with the
+different nodes. This is done since HAProxy does not support adding of new
+nodes through the socket connection.
+The socket connection to HAProxy does not currently have support for adding or
+removing servers without adding them to the configuration
+file \cite{haproxy:configuration_manual}. 
 
 \section{Analysis}
  %Look at the data
@@ -353,14 +437,28 @@ to the stuff of stuff.
 \subsection{Conclusion}
 
 \section{Appendix}
-\lstinputlisting[label=haproxy.cfg,caption=HAProxy configuration file jinja template]
-{chapter1/Webscaler/etc/haproxy.cfg}
-
 \newgeometry{margin=2cm}
 \thispagestyle{empty}
 \begin{center}
-\lstinputlisting[label=webscaler.py,caption=Webscaler main
+\lstinputlisting[label=haproxy.cfg,caption=HAProxy configuration file jinja template]
+{chapter1/Webscaler/etc/haproxy.cfg}
+\lstinputlisting[label=lst:clouddata.txt,caption=Cloud data injected in
+instnace]{chapter1/Webscaler/etc/clouddata.txt}
+
+\lstinputlisting[label=lst:webscaler.py,caption=Webscaler main
 application,language=Python]
 {chapter1/Webscaler/webscaler.py}
+\lstinputlisting[label=lst:nova.py,caption=Nova.py: OpenStack integration,
+language=Python]{chapter1/Webscaler/bin/nova.py}
+
+\lstinputlisting[label=lst:haproxy.py,caption=haproxy.py: HAProxy integration,
+language=Python]{chapter1/Webscaler/bin/haproxy.py}
+
+\lstinputlisting[label=lst:hastats.py,caption=hastats.py: HAProxy statistical integration,
+language=Python]{chapter1/Webscaler/bin/hastats.py}
+
+\lstinputlisting[label=lst:haconn.py,caption=haconn.py: HAProxy socket
+connection class,
+language=Python]{chapter1/Webscaler/bin/haconn.py}
 \end{center}
 \restoregeometry
