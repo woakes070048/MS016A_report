@@ -88,6 +88,8 @@ It is also worth noting that it will not only save the provider money, but
 ultimately lower energy usage that could lower the environmental impact of a
 service.
 
+%% Get some more information about haproxy in here
+
 
 \section{Approach}
 This study will focus on creating a application that enables scaling of a web 
@@ -243,15 +245,97 @@ level of resources. That would be more of a proactive approach, and not a
 reactive approach as this study intends.
 
 \section{Result}
-%What happened
-This study presents a Webscaler written in Python that integrates into
-OpenStack Nova and uses the load balancer HAProxy.
+This study presents a implementation of the desired application, that can scale
+servers by the incoming rate of web requests. It is totally written in Python,
+and uses libraries available to integrate with OpenStack and HAProxy.
+
+The application runs on the load balancer server, as this gives access to the
+local socket connection made available by HAProxy. Through this socket
+connection the script can communicate with the load balancer and get the
+current metrics. This makes the basis for the data that is needed to calculate
+the needed amount of web servers.
+
+The program is built to be run continuous, meaning it will always be on. It
+could simply be transformed into a service, but at the time being it is
+running as a user started application. 
 
 \subsection{Program flow}
+The program works with on a few main principles. This is to run every
+\textit{60} seconds, and do the calculation to either boot up new servers, or
+shut down the existing once. This is done by running a continuous loop, that
+every 60 seconds, gathers new performance data from the load balancer. 
 
-\subsection{Launching instances from Python with nova}
+\begin{figure}[htp]
+\centering
+\makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{chapter1/program_flow}}
+\caption{\label{fig:program_flow}Program flow}
+\end{figure}
 
-\subsection{Automatic configuration of }
+As the program runs every minute, it will create an average of the cumulated
+web requests on a minute basis. As seen on the figure \ref{fig:program_flow}
+this metric allows the application to define what should happen. The different
+possibilities are a result of the need of more or less servers. If there are
+more servers needed, the application will either start existing shutdown
+instances, or create new instances. If there is no need for servers, the
+instances will either be shutdown or destroyed. This ensures that the absolute
+minimum of needed servers are in action, but at the same time, if the need
+arises, an additional instance will be available faster than when creating new
+instances.
+
+There are two essential parts of gathering the data. First of all, the
+application starts by running two rounds without doing anything. This is to be
+able to establish a baseline for what to do. After the baseline is established,
+the new metrics are calculated. 
+
+With the gathered metrics a simple calculation can be done to calculate the
+need servers. This is shown in the code \ref{needed_servers}, and is an
+essential part of the main Webscaler application.
+
+%\newgeometry{margin=2cm}
+%\thispagestyle{empty}
+\begin{center}
+\lstinputlisting[label=needed_servers,caption=Calculation of needed servers,
+language=Python,firstline=167,lastline=175]
+{chapter1/Webscaler/webscaler.py}
+\end{center}
+%\restoregeometry
+
+With the code \ref{needed_servers} it is possible to test if there is need for
+more or less servers. This is tested in the main loop of the application, that
+executes the functions \textit{scale\_up(Needed)} or
+\textit{scale\_down(Needed)} according to the amount of
+servers that are running in comparison to what is needed.
+
+After the instance count is handled, the load balancer will get an updated
+configuration with the new servers.
+
+
+\subsection{Program structure}
+\begin{minipage}[t]{0.7\textwidth}
+Many stuffing stuffings with suffing in the stuffing, since stuffing is stuffed
+to the stuff of stuff.
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+\dirtree{%
+.1 Webscaler.
+.2 bin.
+.3 haconn.py.
+.3 haproxy.py.
+.3 hastats.py.
+.3 \_\_init\_\_.py.
+.3 nova.py.
+.2 etc.
+.3 clouddata.txt.
+.3 haproxy.cfg.
+.3 openstack.cfg.
+.2 README.md.
+.2 requirements.txt.
+.2 webscaler.py.
+}
+\end{minipage}
+
+\subsection{Configuration options}
+
 \section{Analysis}
  %Look at the data
 \begin{figure}[htp]
@@ -271,3 +355,12 @@ OpenStack Nova and uses the load balancer HAProxy.
 \section{Appendix}
 \lstinputlisting[label=haproxy.cfg,caption=HAProxy configuration file jinja template]
 {chapter1/Webscaler/etc/haproxy.cfg}
+
+\newgeometry{margin=2cm}
+\thispagestyle{empty}
+\begin{center}
+\lstinputlisting[label=webscaler.py,caption=Webscaler main
+application,language=Python]
+{chapter1/Webscaler/webscaler.py}
+\end{center}
+\restoregeometry
