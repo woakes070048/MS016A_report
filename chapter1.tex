@@ -169,6 +169,7 @@ as what it does is to disable new connection to the proxy, but enables the
 existing connections to finish. This is powerful when shutting down backends.
 
 \subsection{Data collection: Acquiring and analysing results}
+\label{approach:data}
 To enable the scaling there is a need to have a picture of the current state of
 service. This is what the load balancer can give with the use of the statistics
 given through the socket interface. There are many different metrics to look at
@@ -293,6 +294,7 @@ essential part of the main Webscaler application.
 
 %\newgeometry{margin=2cm}
 %\thispagestyle{empty}
+% NOTE THAT THE LIMIT FOR A MACHINE IS STATIC AT THIS POINT
 \begin{center}
 \lstinputlisting[label=needed_servers,caption=Calculation of needed servers,
 language=Python,firstline=167,lastline=175]
@@ -334,18 +336,18 @@ $ pip install -r requirements.txt
 \dirtree{%
 .1 Webscaler.
 .2 bin.
-.3 haconn.py.
-.3 haproxy.py.
-.3 hastats.py.
+.3 haconn.py \ref{lst:haconn.py}.
+.3 haproxy.py \ref{lst:haproxy.py}.
+.3 hastats.py \ref{lst:hastats.py}.
 .3 \_\_init\_\_.py.
-.3 nova.py.
+.3 nova.py \ref{lst:nova.py}.
 .2 etc.
-.3 clouddata.txt.
-.3 haproxy.cfg.
+.3 clouddata.txt \ref{lst:clouddata.txt}.
+.3 haproxy.cfg \ref{haproxy.cfg}.
 .3 openstack.cfg.
 .2 README.md.
 .2 requirements.txt.
-.2 webscaler.py.
+.2 webscaler.py \ref{lst:webscaler.py}.
 }
 \end{minipage}
 The \textit{webscaler.py} file contains the main logic of the scaler
@@ -356,7 +358,7 @@ some central functionality for operating and communicating with the load
 balancer and OpenStack. The implementation of this is described in more detail
 here.
 
-\subsubsection{OpenStack integration}
+\subsection{OpenStack integration}
 The OpenStack integration uses a module to Python called the
 \textit{python-novaclient}. This is built on the same module that is possible
 to use from the command line to handle OpenStack nova operations. This
@@ -386,7 +388,8 @@ language=Python,firstline=67,lastline=80]
 {chapter1/Webscaler/bin/nova.py}
 \end{center}
 
-A new instance is created with the function \textit{create\_backend()}. This
+A new instance is created with the function \textit{create\_backend()}
+\ref{lst:create_backend}. This
 defines all the needed parameters for the new instances to be created.
 One of the things that is important to handle when using OpenStack, is the time
 it takes after the instance has been created until the IP address is associated
@@ -407,31 +410,102 @@ quite portable. This means that if the python-novaclient library cannot be
 used, the only change needed is the nova-openstack python class created in the
 \textit{nova.py} file.
 
-\subsubsection{HAProxy integration}
+\subsection{HAProxy integration}
 There are two ways this application works with HAProxy. This is through the
 socket connection that are established by the \textit{HAconn.py} file,
 \ref{lst:haconn.py}: \nameref{lst:haconn.py}, and with the generation of the
 configuration file haproxy.conf, \ref{haproxy.cfg}:\nameref{haproxy.cfg},
 located under \textit{/etc/haproxy/haproxy.conf}. This uses the Python template
 library \textit{Jinja} to make a template file that can be injected with the
-different nodes. This is done since HAProxy does not support adding of new
-nodes through the socket connection.
-The socket connection to HAProxy does not currently have support for adding or
-removing servers without adding them to the configuration
-file \cite{haproxy:configuration_manual}. 
+different nodes. This is done since the socket connection to HAProxy not
+currently supports adding or removing servers
+\cite{haproxy:configuration_manual}.
+
+What the socket connection is perfect for, is to gather metrics and data about
+the current status. It is also possible to enable, disable or drain the
+instances. This is important, especially the drain mode which makes it possible
+to ensure that no connections are lost in mid-transit. When a backend, as the
+webserver is called, is in draining mode, no more connections will be
+established to the host, but the existing will close when done. This is perfect
+when scaling down the amount of servers, and this is done in the
+\textit{handle\_scaledown} function in \textit{Webscaler.py}
+\ref{lst:webscaler.py}.
+
+In the \textit{hastats.py} the statistical metrics is gathered from HAProxy
+socket connection, and parsed to a dictionary. This is what is being used to
+find the cumulated requests, that are needed to calculate the needed backends.
+
+\subsection{Output of the \textit{Webscaler}}
+In the approach it were specified which metrics were needed to be able to see
+that the dynamic scaling application performed as expected \ref{approach:data}.
+These data are written every time the application closes, creating a
+timestamped file with the gathered data.
+
+\begin{center}
+\lstinputlisting[label=lst:data_output,caption=Data
+output,language=Python,firstline=1,lastline=2]
+{chapter1/webscaler_output.txt}
+\end{center}
+
+The output is generated automatic in csv format based on the keys and values in
+the list \textit{metrics} which is updated for every run. This does that it is
+easy to change the script to write to file for every run, and not just when the
+application is done.
+The fields describes the following: \\
+\begin{table}[h]
+\begin{tabular}{ll}
+\textbf{Name}   & \textbf{Description}                  \\ \hline
+\textbf{diffpt} & Accumulated difference since last run \\
+\textbf{haactive} & Active servers in HAProxy \\ 
+\textbf{active} & Active servers in OpenStack\\ 
+\textbf{epoch} &  Seconds since the script were initiated\\
+\textbf{acu} &  Accumulated requests since last load balancer restart\\
+\textbf{date} & Date timestamp in ISO format \\
+\textbf{diff} & Requests per second in the last time period \\
+\textbf{needed} & The amount of servers needed
+\end{tabular}
+\end{table}
+
+This is the basis of the application, how it gathers the data, and uses the
+data and OpenStack to decide and build the new instances. It is built on the
+basis that we want a minimum of servers to ensure stability, but also speed
+with having sleeping machines. This would be relevant in a ideal world, where
+you pay money for the machines you have running, and pay less for the machines
+that are shutdown. You are after all still using storage space.
 
 \section{Analysis}
- %Look at the data
+To ensure that the application runs as designed it has been run with the script
+described in \ref{approach:data}. This load generating script is meant to
+illustrate a rapid growth of webrequests, so that there is a need for more
+servers.
+The output of the webscaler is the following when this loadtest has finished
+\ref{lst:data_output_complete}.
+
+\begin{center}
+\lstinputlisting[label=lst:data_output_complete,caption=Data
+output,language=Python,firstline=1,lastline=26]
+{chapter1/webscaler_output.txt}
+\end{center}
+
+The metrics that are displayed \ref{lst:data_output_complete} can be presented 
+as a graph where the rate of requests, active servers ,pending servers and the 
+needed servers are illustrated fig:~\ref{fig:server_scaling}.
+
 \begin{figure}[htp]
-%\centering
-%\includegraphics[scale=0.6]{chapter1/server_scaling}
 \centering
 \makebox[\textwidth][c]{\includegraphics[width=1.25\textwidth]{chapter1/server_scaling_with_requests_legend}}
 \caption{\label{fig:server_scaling}Scaling of servers}
 \end{figure}
 
+This shows that the scaling algorithm works, and that it can scale up based on
+the total number of requests.
+
 \section{Discussion and conclusion}
 % Why did i not use MLN
+% Reactive handling
+% Sometimes slow to respond
+% 
+
 \subsection{Improvements}
 
 \subsection{Conclusion}
