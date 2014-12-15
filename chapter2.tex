@@ -9,7 +9,7 @@
 
 The given problem statement in this project was as follows:
 
-\emph{Setup and evaluate and compare the perlbal and pound load balancers for a
+\emph{Setup and evaluate and compare the HAproxy and pound load balancers for a
 web- service with regard to:
 \begin{itemize}
     \item Configureability
@@ -19,17 +19,30 @@ web- service with regard to:
 
 \section{Background}
 Load balancers are important to most of the high end websites that are
-available. Ensuring high availability and great scalability. They can be a part
-of even the smallest sites that are prone to fail, but that need high uptime,
-or to balance the load over multiple webservers, or database servers.
+available. Ensuring high availability and scalability. They can be a part
+of even the smallest sites that are prone to fail, ensuring high uptime,
+or to balance the load over multiple webservers, or even database servers.
+
+There are many different load balancers available. Many of these are open source
+and free, but with varying quality and support. There are also many enterprise
+load balancers or reverse proxy´s as they are usually referenced to, like
+Alteon product from Radware and Big IP from F5. But a load balancer could be as
+simple as a single web server running apache or nginx.
+
+% why do we need to compare the balancers.
 
 % Talk about httperf
+\subsection{Performance testing with httperf}
 
 % Talk about HAProxy
+\subsection{HAProxy}
 
 % Talk about Pound
+\subsection{Pound}
 
 \section{Approach}
+In this comparison the two load balancers HAproxy and Pound will be compared on
+the different metrics of c
 % How thing is supposed to be set up
 % Hypothesis
 
@@ -41,12 +54,21 @@ or to balance the load over multiple webservers, or database servers.
 
 \section{Result}
 %What happened
+% os limits
+% sudo apt-get install autoconf libtool -y
+% https://rtcamp.com/tutorials/benchmark/httperf/
+% before make install run ulimit -n 65535
+
 % Subsection: Configurability
 %   Syntax? Functions, documentation, community and continuous support (new
 %   versions?) This is relevant, but not directly to how it works. Evaluate
 %   this!
 %
+\subsection{Configurability}
 
+\subsection{Performance}
+
+\subsection{Scalability}
 
 % the data are presented as described in the approach section
 % how are the tests run
