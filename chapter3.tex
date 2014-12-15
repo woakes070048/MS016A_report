@@ -1,0 +1,299 @@
+\chapter{A monitoring tool for /proc/diskstats}
+\textbf{Keywords: Storage, Performance}
+
+\subsection*{Abstract}
+In this report, a tool for monitoring the \textit{/proc/diskstats} file is
+developed, storing the content for later analysis.
+
+\section{Introduction}
+
+\subsubsection{Problem statement}
+
+The given problem statement in this project was as follows:
+
+\emph{Write a script which is able to collect data from /proc/diskstats and store 
+it in an orderly manner for later analysis.}
+
+\section{Background}
+% describe the task at hand
+While running a system it is sometimes important to be able to gather metrics
+on how the system is performing. One of this metrics are the data from disk
+operations. This can help identify bottlenecks in the system, and give a better
+understanding of how the system is using its resources.
+
+To understand the usage and need for a tool that can monitor the file
+\textit{/proc/diskstat} a short introduction to the files under \textit{/proc}
+and the values stored inside is needed.
+
+\subsection{The /proc folder}
+/proc is a virtual filesystem, which sometimes is reffered to as a process
+information pseudo-file system \cite{tldp:proc}. The files in the folder are
+not \textit{real}, but is rather a means of getting information from the
+kernel.
+
+\subsection{/proc/diskstats}
+The file /proc/diskstats contain information about each block device on the
+system. In newer kernels (from 2.6 and newer) this information is also available
+under the path /sys/block/. Each line has the different information about each
+block device, which could either be the disk itself, or the partitions on it.
+The information for each block device displays the I/O statistics like reads,
+writes and time spent doing the different tasks.
+
+The different fields of the file means the following:
+\begin{enumerate}\itemsep1pt \parskip0pt \parsep0pt
+    \item major number
+    \item minor mumber
+    \item device name
+    \item reads completed successfully
+    \item reads merged
+    \item sectors read
+    \item time spent reading (ms)
+    \item writes completed
+    \item writes merged
+    \item sectors written
+    \item time spent writing (ms)
+    \item I/Os currently in progress
+    \item time spent doing I/Os (ms)
+    \item weighted time spent doing I/Os (ms)
+\end{enumerate}
+\label{lbl:column_description}
+
+These are then representing each column in the file which can look like the
+following:
+%\begin{Verbatim}[label=Contents of /proc/diskstats]
+\begin{center}
+\begin{lstlisting}[label=lbl:content, caption=Contents of /proc/diskstats,
+numbers=none]
+ 253       0 vda 31410 806 1020922 2564596768 1465561 1382324 54703840 3579730636 0 7229708 40955272
+ 253       1 vda1 31182 334 1015322 2564547860 1465459 1382324 54703024 3579730152 0 7229220 40954784
+\end{lstlisting}
+\end{center}
+%\end{Verbatim}
+\label{lbl:content}
+
+There are other tools which enables the logging of different metrics from block
+devices as well, like the \textit{sar} tool and \textit{iostat}. One of the
+benefits the monitoring of /proc/diskstats holds over the usage of other tools,
+is the low overhead, and no need for additional packages.
+
+This tool will enable the continuous logging of the kernel counters for the
+block devices specified, and prepare the data for later analysis.
+
+\section{Approach}
+% How thing is supposed to be set up
+% Hypothesis
+% How is the data supposed to look like and how to analyze the data
+% How is the chosen approach provide an answer to the problem statement
+
+The operationalization asks for a tool, which can read from the /proc/diskstats
+file and store the data appropriately for later analysis. The tool should be
+developed in Python, as this is one of the common scripting languages used. It
+also enables easy file operations functionality which is important to this
+task, as the information gathered will be in the format of a file.
+
+The intention should be that the tool could be used in two ways. The normal
+usage, which would be user execution of the tool. The other way is the
+possibility of running the tool as a cron job. If the tool is run with a
+specific interval executed by the user, this would result in a process staying
+alive in the background the hole time. Running the tool with cron, would on the
+other hand only require the tool to be running at the time of execution, while
+the user would need to have a session open over time if executed by the user.
+This is easily done with applications like \textit{screen} or \textit{tmux},
+but the usage of cron is a better way of doing it if the application should be
+running over longer periods of time.
+
+\subsection{The format of data}
+As shown in the background \vref{lbl:content} the content of
+/proc/diskstats is containd in lines and columns. Since each line represents a
+single block device, the columns of this line contains the information about
+the device. This enables the usage of iterations in python, where each column
+can be splitted on the separators, which is multiple spaces.
+
+The data can therefor be represented as a dictionary in Python. This is a
+key:value based data structure. A single block device can therefor have a
+single dictionary with each value of the /proc/diskstats file beeing
+represented as column:data. Each column get its name from the documentation
+for /proc/diskstats shown on \vref{lbl:column_description}.
+
+\subsection{Storing the data}
+To be able to analyze the results at a later point, the output of the tool
+should be stored to file. One of the criteria for storing the data to file
+would be the possibility of using other tools to analyze the data at a later
+time. Wether the tool is written in Python, Perl or any other language should
+not matter. The most common possibilities for storing to file would be
+\textit{json}, \textit{xml} or \textit{csv}. Both \textit{json} and
+\textit{xml} uses a key:value representation, but also makes it harder to
+format the data without the usage of external libraries. There are also
+numerous ways of interpreting these different formats, as there are multiple
+standards. The choice is therefor to use \textit{csv} which is a simple text
+format which uses the comma notation to separate each value. The top of the
+file should contain the description of each column, and each field should be
+represented with either a comma or 0 if there is no data.
+
+If we takes the previous examples given in the background \vref{lbl:content},
+the final file will look something like the following:
+%\begin{Verbatim}[label=Possible output of monitoring tool]
+\begin{center}
+\begin{lstlisting}[label=lbl:possible_output,caption=Possible output of
+monitoring tool,numbers=none]
+date, major number,minor mumber,device name,reads completed successfully,reads merged,sectors read ...
+date, 253,0,vda,31410,806,1020922,2564596768,1465561,1382324,54703840,3579730636,0,7229708,40955272
+date, 253,1,vda1,31182,334,1015322,2564547860,1465459,1382324,54703024,3579730152,0,7229220,40954784
+\end{lstlisting}
+\end{center}
+%\end{Verbatim}
+
+Including the output from /proc/diskstats, the time stamp of when the test has
+been run is important to include, as this will provide the time interval
+between the two following tests to be calculated.
+The collected data could with this format be imported into any scripting
+language or applications like libreOffice for further work.
+
+\subsection{Different command line options}\label{lbl:mon_command_line_opts}
+As described in the beginning of this section, the tool should be able to be
+run in two different modes, the user-mode and cron-mode. The tool does not need
+to be implemented any specific way for it to work in the different modes, other
+than actually taking some different command line options.
+The needed options is to specify if the application should run the gatherings
+in a loop or not. This is needed only in user-mode and can then take the
+parameter as for how long the tool should sleep between each data gathering.
+This is not need in cron-mode as this is specified in the cron job itself.
+
+The other needed option is to specify which devices that the tool should gather
+information on. By default the tool should store information about all the
+devices, but as a command line option it should also be possible to specify a
+list of devices to focus on. 
+
+\section{Result}
+%What happened
+% what was done
+% partial output of the commands
+This section will present the actual tool that has been developed. It has been
+developed in Python, and does not require any additional modules to work. This
+enables it to work at any distribution, with basic Python installed.
+
+Based on the findings in the approach, the tool has been implemented with the
+following command line options, which were described in
+\vref{lbl:mon_command_line_opts}. This different options is visible with the
+use of \textit{-h} or \textit{--help} when running the tool.
+%\begin{Verbatim}[label=Command line options of diskstats.py]
+\begin{center}
+\begin{lstlisting}[label=lbl:diskstats_help,caption=Command line options of
+disksts.py,columns=fullflexible,numbers=none]
+$ python diskstats.py -h
+usage: diskstats.py [-h] [-l sleep] [-d name [name ...]]
+
+Parser tool for /proc/diskstats
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -l sleep, --loop sleep
+                        Runs the program in a loop. Takes the looptime as
+                        option.
+  -d name [name ...], --device name [name ...]
+                        Names, like sda, sda1...
+\end{lstlisting}
+\end{center}
+%\end{Verbatim}
+
+The tool can therefore be run with the intention of running every second and
+only look at the information for the block device vda. The command for this
+would be the following.
+
+%\begin{Verbatim}[label=Execution of diskstats.py]
+\begin{center}
+\begin{lstlisting}[label=lst:,caption=Execution of disksts.py,numbers=none]
+$ python diskstats.py -l 1 -d vda
+Gathering data for ['vda']
+Gathering data for ['vda']
+\end{lstlisting}
+\end{center}
+%\end{Verbatim}
+
+When running with this options, a file with the name \textit{mon\_vda.csv} would
+be created. The contents of the file would be in csv format, and formated as
+described in the approach.
+
+%\begin{Verbatim}[label=Gathered data stored in file from diskstats.py]
+\begin{center}
+\begin{lstlisting}[label=lst:out_data,caption=Gathered data stored in file from
+diskstst.py,numbers=none]
+datetime,major_number,minor_number,device_name,read_completed_successfully,reads_merged,sectors_read,time_spent_reading(ms),writes_completed,writes_merged,sectors_written,time_spent_writing_(ms),IO_currently_in_progress,time_spent_doing_IO_(ms),weighted_time_spent_doing_IO
+2014-12-14T14:27:07.878920,253,0,vda,5964436,13925,540485938,2768828,1289917,1519024,48384848,9417637,0,1382484,12180809
+2014-12-14T14:27:08.881174,253,0,vda,5964436,13925,540485938,2768828,1289934,1519049,48385184,9417668,0,1382487,12180840
+\end{lstlisting}
+\end{center}
+%\end{Verbatim}
+
+As described it should also be possible to run the script as a cron job.
+\begin{center}
+\begin{lstlisting}[label=lst:cronjob,caption=Cronjob example, numbers=none]
+# Diskstats cronjob
+# This cronjob would execute every minute, and capture only the information of vda
+*/1 * * * * /usr/bin/python /path/to/diskstats.py -d vda
+\end{lstlisting}
+\end{center}
+
+The final version of the tool is attached in the appendix
+\vref{lst:diskstats.py}. Most of the logic that has been implemented is related
+to the different command line options, as the tool needs different 
+
+\section{Analysis}
+ %Look at the data
+ % Analyze the hypothesis
+The aim of this tool were to be able to collect the information that was
+possible to be gathered from the /proc/diskstats file. It is able to collect
+the data, and store it as a csv file, which is a readable format that is
+supported by many different softwares.
+The script does also implement many different function beyond what is outlined
+in the initial description of the needed tool, as the possibility for it being
+run as a cron job, and with variable sleeping lengths.
+
+However there are one issue that has been discovered. When running the tool as
+a cron job, there is no way to specify the path to where the file should be
+stored. The output of the tool is therefor lost.
+
+This has been fixed, by adding another command line option,
+\textit{--outfilepath} or \textit{-o}.
+
+\section{Discussion and conclusion}
+This tool is intended to enable the user to store the contents of the file
+/proc/diskstats. This tool enables the gathering of the information for later
+analysis, by storing all the specified content of the file.
+By default the application runs in a simple manner, but also includes aditional
+functionality, making it possible to use the tool in many different situations
+where debugging of file system is important.
+
+This tool does the same thing as many other tools available, but at a lower
+level. Most of the tools available, will do some calculations on the data, but
+this tool only gathers the data for later analysis.
+
+This is in many cases a benefit. This will also make less of an impact on the
+general performance of the system. This said, the performance impact of other
+tools have not been tested here.
+
+%\subsection{Improvements}
+%The improvements to the tool would be outside the scope of this project, as the
+%next thing would be the implementation of differentiation between the different
+%collected metrics. The data on its own does not mean much 
+
+\subsection{Conclusion}
+In summary, the task has been completed to the specified requirements by
+solving the following main points.
+\begin{itemize}
+    \item Collecting the information from \textit{/proc/diskstats}
+    \item Storing the data in a orderly manner for later analysis
+\end{itemize}
+
+This conclude a simple tool that can capture the data from the kernel
+file system for later analysis. The tool work as intended, and can capture the
+content of the file over longer periods of time.
+
+\section{Appendix}
+%\newgeometry{margin=2cm}
+\thispagestyle{empty}
+\begin{center}
+\lstinputlisting[label=lst:diskstats.py,caption=diskstats.py,
+language=Python]{chapter3/diskstats/diskstats.py}
+\end{center}
+%\restoregeometry
