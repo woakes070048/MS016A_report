@@ -22,24 +22,24 @@ in many parts of the industry \cite{OpenStack:Users}. You can rent resources
 from large providers like Amazon which provides a public cloud infrastructure 
 or by building your own cloud infrastructure. This can be done with open source 
 tools like OpenStack. There is also a third alternative that is the hybrid cloud,
-which enables easy transaction from using both a private cloud and public clouds.\\
+which enables easy transaction from using both a private cloud and public clouds.
 
 Having these cloud infrastructures, make it possible to have services
 that scale over multiple locations, and to utilize the resources that are
 available. When having spanning clouds we can use this to our advantage 
 and create solutions to create more sturdy solutions, that will scale web
-services in a more cost efficient way.\\
+services in a more cost efficient way.
 
 Web services with many consumers or with a high demand for calculation power
 will need to be able to use multiple servers to provide service to the clients.
 The number of servers needed is proportionate to the number of visitors and
 calculations needed to provide the service. If there is not enough servers to
 handle the load, there will a result in long response times or even loss of
-service.\\
+service.
 
 To handle this we need a way of scaling the number of servers in a way that
 will give the expected result for the consumers, but at the same time use the
-bare minimum amount needed in able to save money.\\
+bare minimum amount needed in able to save money.
 
 This will make the basis for this chapter where we will look into a solution to
 scale a web service over multiple servers in an OpenStack environment.
@@ -54,7 +54,7 @@ where each is responsible to handle a part of the operation in the cloud. Most
 notably of these are nova, which handles the instances it selves and the
 communication with the vitalization hypervisor. There are a total of 13
 services which handles everything from identities, storage, networking,
-orchestration and much more.\\
+orchestration and much more.
 
 OpenStack is a viable cloud solution due to the large scale implementation, and
 the large community supporting further development. One of the features provided 
@@ -79,7 +79,7 @@ checks and much more \cite{haproxy:2014}. There are other free load balancers
 that can be used, such as apache with mod, nginx, pound and varnish. Varnish is
 mostly used only for caching and does not support SSL/TLS termination. HAProxy
 appears to be a de facto standard when it comes to open source load
-balancers.\\
+balancers.
 
 These solutions creates a background for the solution to be created that can
 make a service scale in a cloud environment. All this so we can save money, and
@@ -234,7 +234,7 @@ descreased, numbers=none]{chapter1/simulator.txt}
 
 With the results presented by the application it will be possible to see a
 correlation between the needed scaling of servers based on the incoming http
-requests.\\
+requests.
 
 With this approach it will be possible to create a webscaler by this design
 that can scale up new instances in OpenStack based on the number of requests
@@ -491,7 +491,7 @@ The metrics that are displayed \ref{lst:data_output_complete} can be presented
 as a graph where the rate of requests, active servers ,pending servers and the 
 needed servers are illustrated fig:~\ref{fig:server_scaling}.
 
-\begin{figure}[htp]
+\begin{figure}[H]
 \centering
 \makebox[\textwidth][c]{\includegraphics[width=1.25\textwidth]{chapter1/server_scaling_with_requests_legend}}
 \caption{\label{fig:server_scaling}Scaling of servers}
@@ -504,14 +504,74 @@ the total number of requests.
 % Why did i not use MLN
 % Reactive handling
 % Sometimes slow to respond
-% 
+
+The goal of this paper were to write an application, which could scale
+web servers according to the amount of requests. To solve this, a static
+theoretical amount of connection, were set as a soft limitation for the web
+servers, meaning that a single web server were designated to handle a specific
+amount of requests. In real life situations this could be based on the
+benchmarked performance of a web application. Each web application do have its
+own saturation point as they do different tasks, and this is therefore a highly
+variable factor.
+
+The webscaler implementation is based on a reactive method. This means that the
+number of servers started or stopped is based on the difference of the last
+time period, which is by default 60 seconds. Since the time period is over 60
+seconds the number of servers are based on the mean number of connections, and
+not the peak traffic in the period. As we can see on the graph
+\vref{fig:server_scaling} we see that the webscaler does handle different
+connection loads, but lags behind with the time it takes for a new server to
+spawn.
+
+The new servers are generated on a need-at-the-time basis, meaning that new
+servers are generated on the fly. This enables the scaler to create servers
+when needed, and a faulty server would not be running for long. If the server
+has faulted, the healthcheck of the load balancer will fail, but the server
+will still be active. As the new servers are created at runtime, the generation
+is speed up through forking of the generation process. This means that every
+new server are generated simultaneous. Since the scaler uses the integration to
+the nova APIs, the script need to wait for a IP address to be assigned to the
+new servers. For this reason, the forking is perfect, as it will reduce the
+time for new servers to be taken to approximately the same as it would take to
+generate one server.
+
+By default the webscaler will start and hold the minimum number of servers
+active. This means that with this configuration there will always be two
+servers running. This is to ensure that there is fault tolerance if one of the
+machines should fail.
+
 
 \subsection{Improvements}
+% Proactive handeling
+% Different modes of measuring connection meadians.
+There are many improvements that can be made to both the application and the
+way of thinking about the scaling of web servers. The most notably improvement
+that can be made is through the conclusions of the requests data. This is
+outside the scope of this task, but a scaler script should use machine learning
+techniques to find the perfect number of servers it should run. This would
+require a lot of data to be gathered, and a calculation of expected deviation,
+but it is quite possible that this would result in better scaling, and more
+predictability. This is based on the reactive handling the scaler uses, as to
+the proactive handling of web server scaling a machine learning or even a
+prefixed baseline scaling would have.
+
+This application only handles the mean number of connections over the last
+minute. It does not take into account a longer period of time, or the peaks
+experienced through the time period. Through different measuring modes,
+flapping of servers, where they are created and deleted, would be limited.
 
 \subsection{Conclusion}
+Though there are improvements, the application works well in regards to scaling
+servers based on the incoming load. Through the integration to both the HAProxy
+load balancer and OpenStack it is able to communicate well with the different
+tools needed to create a good and effective scaling solution. The time it takes
+for new machines to be added is the time OpenStack uses to create them.
 
-\section{Appendix}
+With this it can be concluded that the webscaler does fulfill the
+specifications of the problem statement.
+
 \newgeometry{margin=2cm}
+\section{Appendix}
 \thispagestyle{empty}
 \begin{center}
 \lstinputlisting[label=haproxy.cfg,caption=HAProxy configuration file jinja template]
